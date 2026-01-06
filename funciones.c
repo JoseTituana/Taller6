@@ -1,104 +1,158 @@
 #include <stdio.h>
 #include <string.h>
+#include "funciones.h"
 
-#define MAX_PROD 10
+/* REGISTRAR VEHICULO */
+void registrarVehiculo() {
+    FILE *archivo = fopen("vehiculos.txt", "a");
+    Vehiculo v;
 
-char nombres[MAX_PROD][50];
-float precios[MAX_PROD];
-int cantidad = 0;
-void ingresarProductos() {
-    int i;
-    printf("\nCuantos productos deseas ingresar (maximo 10)? ");
-    scanf("%d", &cantidad);
-
-    if (cantidad > MAX_PROD) {
-        cantidad = MAX_PROD;
-        printf("Solo se guardaran los primeros 10.\n");
-    }
-
-    for (i = 0; i < cantidad; i++) {
-        printf("Nombre del producto %d: ", i + 1);
-        scanf("%s", nombres[i]);
-
-        printf("Precio del producto %d: ", i + 1);
-        scanf("%f", &precios[i]);
-    }
-}
-void mostrarProductos() {
-    int i;
-    if (cantidad == 0) {
-        printf("\nNo hay productos registrados.\n");
+    if (archivo == NULL) {
+        printf("Error al abrir el archivo.\n");
         return;
     }
 
-    printf("\nLista de productos:\n");
-    for (i = 0; i < cantidad; i++) {
-        printf("%d. %s - $%.2f\n", i + 1, nombres[i], precios[i]);
-    }
+    printf("Codigo del vehiculo: ");
+    scanf("%d", &v.codigo);
+
+    printf("Anio: ");
+    scanf("%d", &v.anio);
+
+    printf("Marca: ");
+    scanf("%s", v.marca);
+
+    printf("Modelo: ");
+    scanf("%s", v.modelo);
+
+    printf("Color: ");
+    scanf("%s", v.color);
+
+    printf("Precio: ");
+    scanf("%f", &v.precio);
+
+    printf("Es nuevo? (1=Si, 0=No): ");
+    scanf("%d", &v.esNuevo);
+
+    v.disponible = 1;
+
+    fprintf(archivo, "%d %d %s %s %s %.2f %d %d\n",
+            v.codigo, v.anio, v.marca, v.modelo,
+            v.color, v.precio, v.esNuevo, v.disponible);
+
+    fclose(archivo);
+    printf("Vehiculo registrado correctamente.\n");
 }
-void calcularTotal() {
-    float total = 0;
-    int i;
-    for (i = 0; i < cantidad; i++) {
-        total += precios[i];
-    }
-    printf("\nEl precio total del inventario es: $%.2f\n", total);
-}
-void mostrarMasCaroYMasBarato() {
-    if (cantidad == 0) {
-        printf("\nNo hay productos registrados.\n");
+
+/* MOSTRAR VEHICULOS */
+void mostrarVehiculos() {
+    FILE *archivo = fopen("vehiculos.txt", "r");
+    Vehiculo v;
+
+    if (archivo == NULL) {
+        printf("No hay vehiculos registrados.\n");
         return;
     }
 
-    int i;
-    int posCaro = 0;
-    int posBarato = 0;
+    printf("\n--- LISTA DE VEHICULOS ---\n");
+    while (fscanf(archivo, "%d %d %s %s %s %f %d %d",
+                  &v.codigo, &v.anio, v.marca, v.modelo,
+                  v.color, &v.precio, &v.esNuevo, &v.disponible) == 8) {
 
-    for (i = 1; i < cantidad; i++) {
-        if (precios[i] > precios[posCaro])
-            posCaro = i;
-        if (precios[i] < precios[posBarato])
-            posBarato = i;
+        printf("Codigo: %d | %s %s | $%.2f | %s | %s\n",
+               v.codigo, v.marca, v.modelo, v.precio,
+               v.esNuevo ? "Nuevo" : "Usado",
+               v.disponible ? "Disponible" : "Vendido");
     }
 
-    printf("\nProducto mas caro: %s ($%.2f)\n", nombres[posCaro], precios[posCaro]);
-    printf("Producto mas barato: %s ($%.2f)\n", nombres[posBarato], precios[posBarato]);
+    fclose(archivo);
 }
-void calcularPromedio() {
-    if (cantidad == 0) {
-        printf("\nNo hay productos registrados.\n");
+
+/* BUSCAR VEHICULOS POR PRESUPUESTO ±5000 */
+void buscarVehiculos(float presupuesto, char marca[]) {
+    FILE *archivo = fopen("vehiculos.txt", "r");
+    Vehiculo v;
+    int encontrado = 0;
+
+    float minimo = presupuesto - 5000;
+    float maximo = presupuesto + 5000;
+
+    if (archivo == NULL) {
+        printf("No hay vehiculos registrados.\n");
         return;
     }
 
-    float suma = 0;
-    int i;
-    for (i = 0; i < cantidad; i++) {
-        suma += precios[i];
-    }
+    printf("\nVehiculos marca %s con precios entre %.2f y %.2f:\n",
+           marca, minimo, maximo);
 
-    printf("\nEl precio promedio es: $%.2f\n", suma / cantidad);
-}
-void buscarProducto() {
-    if (cantidad == 0) {
-        printf("\nNo hay productos registrados.\n");
-        return;
-    }
+    while (fscanf(archivo, "%d %d %s %s %s %f %d %d",
+                  &v.codigo, &v.anio, v.marca, v.modelo,
+                  v.color, &v.precio, &v.esNuevo, &v.disponible) == 8) {
 
-    char nombreBuscado[50];
-    int i, encontrado = 0;
+        if (strcmp(v.marca, marca) == 0 &&
+            v.precio >= minimo &&
+            v.precio <= maximo &&
+            v.disponible == 1) {
 
-    printf("\nEscribe el nombre del producto que quieres buscar: ");
-    scanf("%s", nombreBuscado);
-
-    for (i = 0; i < cantidad; i++) {
-        if (strcmp(nombres[i], nombreBuscado) == 0) {
-            printf("El precio de %s es: $%.2f\n", nombres[i], precios[i]);
+            printf("Codigo: %d | %s %s | $%.2f\n",
+                   v.codigo, v.marca, v.modelo, v.precio);
             encontrado = 1;
-            break;
         }
     }
 
     if (!encontrado) {
-        printf("Producto no encontrado.\n");
+        printf("No se encontraron vehiculos con esas condiciones.\n");
+    }
+
+    fclose(archivo);
+}
+
+/* REGISTRAR VENTA */
+void registrarVenta() {
+    FILE *vehiculos = fopen("vehiculos.txt", "r");
+    FILE *temp = fopen("temp.txt", "w");
+    FILE *ventas = fopen("ventas.txt", "a");
+
+    Vehiculo v;
+    char cliente[40];
+    int codigoBuscado;
+    int vendido = 0;
+
+    if (vehiculos == NULL || temp == NULL || ventas == NULL) {
+        printf("Error al procesar la venta.\n");
+        return;
+    }
+
+    printf("Nombre del cliente: ");
+    scanf("%s", cliente);
+
+    printf("Codigo del vehiculo: ");
+    scanf("%d", &codigoBuscado);
+
+    while (fscanf(vehiculos, "%d %d %s %s %s %f %d %d",
+                  &v.codigo, &v.anio, v.marca, v.modelo,
+                  v.color, &v.precio, &v.esNuevo, &v.disponible) == 8) {
+
+        if (v.codigo == codigoBuscado && v.disponible == 1 && !vendido) {
+            v.disponible = 0;
+            fprintf(ventas, "%s %d %s %s %.2f\n",
+                    cliente, v.codigo, v.marca, v.modelo, v.precio);
+            vendido = 1;
+            printf("Venta registrada correctamente.\n");
+        }
+
+        fprintf(temp, "%d %d %s %s %s %.2f %d %d\n",
+                v.codigo, v.anio, v.marca, v.modelo,
+                v.color, v.precio, v.esNuevo, v.disponible);
+    }
+
+    fclose(vehiculos);
+    fclose(temp);
+    fclose(ventas);
+
+    remove("vehiculos.txt");
+    rename("temp.txt", "vehiculos.txt");
+
+    if (!vendido) {
+        printf("Vehiculo no disponible o codigo incorrecto.\n");
     }
 }

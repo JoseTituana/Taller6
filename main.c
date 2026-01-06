@@ -3,46 +3,43 @@
 
 int main() {
     int opcion;
+    float presupuesto;
+    char marca[30];
 
     do {
-        printf("\n MENU \n");
-        printf("1. Ingresar productos\n");
-        printf("2. Mostrar productos\n");
-        printf("3. Calcular total del inventario\n");
-        printf("4. Producto mas caro y mas barato\n");
-        printf("5. Calcular promedio de precios\n");
-        printf("6. Buscar producto por nombre\n");
-        printf("7. Salir\n");
-        printf("Elige una opcion: ");
+        printf("\n--- SISTEMA Ruedas de Oro ---\n");
+        printf("1. Registrar vehiculo\n");
+        printf("2. Mostrar vehiculos\n");
+        printf("3. Buscar vehiculos por presupuesto y marca\n");
+        printf("4. Registrar venta\n");
+        printf("0. Salir\n");
+        printf("Opcion: ");
         scanf("%d", &opcion);
 
-        switch(opcion) {
+        switch (opcion) {
             case 1:
-                ingresarProductos();
+                registrarVehiculo();
                 break;
             case 2:
-                mostrarProductos();
+                mostrarVehiculos();
                 break;
             case 3:
-                calcularTotal();
+                printf("Presupuesto: ");
+                scanf("%f", &presupuesto);
+                printf("Marca: ");
+                scanf("%s", marca);
+                buscarVehiculos(presupuesto, marca);
                 break;
             case 4:
-                mostrarMasCaroYMasBarato();
+                registrarVenta();
                 break;
-            case 5:
-                calcularPromedio();
-                break;
-            case 6:
-                buscarProducto();
-                break;
-            case 7:
-                printf("GRACIAS \n");
+            case 0:
+                printf("Saliendo del sistema...\n");
                 break;
             default:
-                printf("Opcion no valida. Intenta otra vez.\n");
-                break;
+                printf("Opcion invalida.\n");
         }
-    } while(opcion != 7);
+    } while (opcion != 0);
 
     return 0;
 }
