@@ -2,7 +2,7 @@
 #include <string.h>
 #include "funciones.h"
 
-/* REGISTRAR VEHICULO */
+
 void registrarVehiculo() {
     FILE *archivo = fopen("vehiculos.txt", "a");
     Vehiculo v;
@@ -43,7 +43,7 @@ void registrarVehiculo() {
     printf("Vehiculo registrado correctamente.\n");
 }
 
-/* MOSTRAR VEHICULOS */
+
 void mostrarVehiculos() {
     FILE *archivo = fopen("vehiculos.txt", "r");
     Vehiculo v;
@@ -54,12 +54,24 @@ void mostrarVehiculos() {
     }
 
     printf("\n--- LISTA DE VEHICULOS ---\n");
-    while (fscanf(archivo, "%d %d %s %s %s %f %d %d",
-                  &v.codigo, &v.anio, v.marca, v.modelo,
-                  v.color, &v.precio, &v.esNuevo, &v.disponible) == 8) {
 
-        printf("Codigo: %d | %s %s | $%.2f | %s | %s\n",
-               v.codigo, v.marca, v.modelo, v.precio,
+    while (fscanf(archivo, "%d %d %s %s %s %f %d %d",
+                  &v.codigo,
+                  &v.anio,
+                  v.marca,
+                  v.modelo,
+                  v.color,
+                  &v.precio,
+                  &v.esNuevo,
+                  &v.disponible) == 8) {
+
+        printf("Codigo: %d | Anio: %d | Marca: %s | Modelo: %s | Color: %s | Precio: $%.2f | %s | %s\n",
+               v.codigo,
+               v.anio,
+               v.marca,
+               v.modelo,
+               v.color,
+               v.precio,
                v.esNuevo ? "Nuevo" : "Usado",
                v.disponible ? "Disponible" : "Vendido");
     }
@@ -67,7 +79,6 @@ void mostrarVehiculos() {
     fclose(archivo);
 }
 
-/* BUSCAR VEHICULOS POR PRESUPUESTO ±5000 */
 void buscarVehiculos(float presupuesto, char marca[]) {
     FILE *archivo = fopen("vehiculos.txt", "r");
     Vehiculo v;
@@ -106,7 +117,7 @@ void buscarVehiculos(float presupuesto, char marca[]) {
     fclose(archivo);
 }
 
-/* REGISTRAR VENTA */
+
 void registrarVenta() {
     FILE *vehiculos = fopen("vehiculos.txt", "r");
     FILE *temp = fopen("temp.txt", "w");
